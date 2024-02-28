@@ -37,6 +37,7 @@ function moduleProject2() {
       row.appendChild(square)
       square.addEventListener('click', () => {
         // 👉 TASK 2 - Use a click handler to target a square 👈
+        square.classList.add("targeted")
       })
     }
   }
@@ -63,6 +64,14 @@ function moduleProject2() {
     allSquares[randomInt].appendChild(mosquito)
   })
 
+  document.querySelector("#grid")
+    .addEventListener("click", function(event) {
+      allSquares.forEach(square => {
+      square.classList.remove("targeted")
+    })},
+    {capture: true})
+  document.querySelector("#container")
+    .addEventListener("click", (event) => event.stopPropagation())
   document.addEventListener('keydown', evt => {
     // 👉 TASK 3 - Use the arrow keys to highlight a new square 👈
 
