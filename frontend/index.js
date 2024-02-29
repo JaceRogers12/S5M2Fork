@@ -35,9 +35,11 @@ function moduleProject2() {
       let square = document.createElement('div')
       square.classList.add('square')
       row.appendChild(square)
-      square.addEventListener('click', () => {
+      square.addEventListener('click', (event) => {
         // 👉 TASK 2 - Use a click handler to target a square 👈
+        document.querySelector(".targeted").classList.remove("targeted")
         square.classList.add("targeted")
+        event.stopPropagation()
       })
     }
   }
@@ -64,19 +66,72 @@ function moduleProject2() {
     allSquares[randomInt].appendChild(mosquito)
   })
 
-  document.querySelector("#grid")
-    .addEventListener("click", function(event) {
-      allSquares.forEach(square => {
-      square.classList.remove("targeted")
-    })},
-    {capture: true})
-  document.querySelector("#container")
-    .addEventListener("click", (event) => event.stopPropagation())
+  let target = () => document.querySelector(".targeted")
+  let cousinIdx = () => {
+    let cIdx
+    let targetSibs = document.querySelector(".targeted").parentElement.children
+    let sibsArray = Array.from(targetSibs)
+    sibsArray.forEach(
+      (child, idx) => {
+        if (child.classList.contains("targeted")) {
+          cIdx = parseInt(idx)
+        }
+      }
+    )
+    return cIdx
+  }
+
   document.addEventListener('keydown', evt => {
     // 👉 TASK 3 - Use the arrow keys to highlight a new square 👈
-
+    if (evt.key === "ArrowRight") {
+      if (target().nextElementSibling === null) {
+        console.log("Out of bounds")
+      } else {
+        target().nextElementSibling.classList.add("targeted")
+        target().classList.remove("targeted")
+      }
+    } 
+    else if (evt.key === "ArrowLeft") {
+      if (target().previousElementSibling === null) {
+        console.log("Out of bounds")
+      } else {
+        target().previousElementSibling.classList.add("targeted")
+        target().nextElementSibling.classList.remove("targeted")
+      }
+    } 
+    else if (evt.key === "ArrowUp") {
+      if (target().parentElement.previousElementSibling === null){
+        console.log("Out of bounds")
+      } else {
+        target().parentElement.previousElementSibling.children[cousinIdx()].classList.add("targeted")
+        target().parentElement.nextElementSibling.children[cousinIdx()].classList.remove("targeted")
+      }
+    }
+    else if (evt.key === "ArrowDown") {
+      if (target().parentElement.nextElementSibling === null) {
+        console.log("Out of bounds")
+      } else {
+        target().parentElement.nextElementSibling.children[cousinIdx()].classList.add("targeted")
+        target().classList.remove("targeted")
+      }
+    }
     // 👉 TASK 4 - Use the space bar to exterminate a mosquito 👈
+    else if (evt.key === " ") {
+      if ((target().children.length > 0) && 
+      (target().firstChild.dataset.status === "alive")) {
+        target()["firstChild"]["dataset"]["status"] = "dead"
+        target()["style"]["background-color"] = "red"
+        if (document.querySelectorAll("img[data-status = alive]").length === 0) {
+          console.log("on the right track")
+          document.querySelector("p.info").textContent = `Extermination completed in ${getTimeElapsed() / 1000} seconds!`
+          let restartButton = document.createElement("button")
+          restartButton.textContent = "Restart"
+          restartButton.addEventListener("click", () => location.reload())
+          document.querySelector("header h2").appendChild(restartButton)
 
+        }
+      }
+    }
     // 👉 TASK 5 - End the game 👈
   })
   // 👆 WORK WORK ABOVE THIS LINE 👆
